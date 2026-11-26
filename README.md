@@ -24,8 +24,11 @@ python main.py
 Use the protocol list or command field to run a code, alias, or number. The
 **Hotkey settings** button opens the shortcut editor; **Cancel timer /
 countdown** and **Exit** remain available in the window. **Test voice** checks
-speech output, and voice errors are shown in the radio log. Global keyboard
-hooks may require elevated permissions on Windows.
+speech output. When **Voice I/O** is enabled, the app also listens for protocol
+names, action names, numbers, and the `cancel` command using Windows' built-in
+speech recognition; recognition stays on the computer. Voice errors are shown
+in the radio log. Global keyboard hooks may require elevated permissions on
+Windows.
 
 ## Build
 

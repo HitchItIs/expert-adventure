@@ -42,7 +42,29 @@ class ProtocolTests(unittest.TestCase):
             VoiceSpy(),
         )
         runner.execute(resolve_protocol("KD-101"))
-        self.assertEqual(sum("Blocked" in message for message in messages), 2)
+        self.assertEqual(sum("Blocked" in message for message in messages), 1)
+
+    def test_live_lockdown_locks_workstation_without_clearing_clipboard_opt_in(self):
+        messages = []
+        runner = ProtocolRunner(
+            {"test_mode": False, "allow_destructive_actions": False},
+            messages.append,
+            VoiceSpy(),
+        )
+        runner._clear_clipboard = MagicMock()
+        runner._lock_workstation = MagicMock()
+        with patch.object(protocols.os, "name", "nt"):
+            runner.lockdown()
+        runner._clear_clipboard.assert_not_called()
+        runner._lock_workstation.assert_called_once_with()
+        self.assertTrue(any("Clipboard cleared" in message and "Blocked" in message for message in messages))
+
+    def test_simulated_protocol_is_not_reported_as_cancelled(self):
+        messages = []
+        runner = ProtocolRunner({"test_mode": True}, messages.append, VoiceSpy())
+        runner.execute(resolve_protocol("KD-101"))
+        self.assertFalse(any("sequence cancelled" in message for message in messages))
+        self.assertTrue(any("sequence complete" in message for message in messages))
 
     def test_restarting_night_mode_cancels_the_previous_shutdown_timer(self):
         runner = ProtocolRunner(

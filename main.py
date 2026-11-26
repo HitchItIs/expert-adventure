@@ -9,6 +9,7 @@ from hotkeys import Hotkeys
 from hotkey_settings import configure_hotkeys
 from protocols import PROTOCOLS, ProtocolRunner, resolve_protocol
 from voice import Voice
+from voice_input import VoiceInput
 
 
 DEFAULT_HOTKEYS = {
@@ -76,6 +77,7 @@ class TacticalOpsApp:
         self.ui_events = queue.Queue()
         self.closing = False
         self.voice = Voice(config.get("voice_enabled", True), self.logs.put)
+        self.voice_input = VoiceInput(self._on_voice_command, self.logs.put)
         self.runner = ProtocolRunner(config, self.logs.put, self.voice)
         self.hotkeys = Hotkeys(
             config,
@@ -98,7 +100,18 @@ class TacticalOpsApp:
         except RuntimeError as exc:
             self.logs.put(f"Global hotkeys unavailable: {exc}")
 
-        self.logs.put("Ready. TEST MODE is on; actions are simulated.")
+        try:
+            if self.voice.enabled:
+                self.voice_input.start()
+        except RuntimeError as exc:
+            self.logs.put(str(exc))
+
+        if self.config.get("test_mode", True):
+            self.logs.put("Ready. TEST MODE is on; actions are simulated.")
+        elif self.config.get("allow_destructive_actions", False):
+            self.logs.put("Ready. LIVE MODE is on.")
+        else:
+            self.logs.put("Ready. LIVE MODE is on; destructive actions are blocked.")
         self.root.after(100, self._drain_logs)
         self.root.after(150, self.command_entry.focus_set)
 
@@ -176,7 +189,7 @@ class TacticalOpsApp:
         self.voice_enabled = tk.BooleanVar(value=self.voice.enabled)
         ttk.Checkbutton(
             actions,
-            text="Voice",
+            text="Voice I/O",
             variable=self.voice_enabled,
             command=self.set_voice_enabled,
         ).pack(side="left", padx=(16, 0))
@@ -247,6 +260,11 @@ class TacticalOpsApp:
                 break
             if event == "toggle_test_mode":
                 self.toggle_test_mode()
+            elif isinstance(event, tuple) and event[0] == "voice_command":
+                if event[1] == "cancel":
+                    self.cancel()
+                else:
+                    self.runner.start(event[1])
 
         messages = []
         while True:
@@ -351,14 +369,36 @@ class TacticalOpsApp:
         self.config["voice_enabled"] = enabled
         self.voice.set_enabled(enabled)
         try:
+            if enabled:
+                self.voice_input.start()
+            else:
+                self.voice_input.stop()
+        except RuntimeError as exc:
+            self.config["voice_enabled"] = previous
+            self.voice.set_enabled(previous)
+            self.voice_enabled.set(previous)
+            messagebox.showerror("Voice input unavailable", str(exc), parent=self.root)
+            return
+        try:
             save_config(self.config, self.config_path)
         except OSError as exc:
             self.config["voice_enabled"] = previous
             self.voice.set_enabled(previous)
             self.voice_enabled.set(previous)
+            if previous:
+                self.voice_input.start()
+            else:
+                self.voice_input.stop()
             messagebox.showerror("Could not save settings", str(exc), parent=self.root)
             return
-        self.logs.put(f"Voice output {'enabled' if enabled else 'disabled'}.")
+        self.logs.put(f"Voice input/output {'enabled' if enabled else 'disabled'}.")
+
+    def _on_voice_command(self, command):
+        if command == "cancel":
+            self.logs.put("Voice command recognized: cancel.")
+        else:
+            self.logs.put(f"Voice command recognized: {command}.")
+        self.ui_events.put(("voice_command", command))
 
     def test_voice(self):
         if not self.voice.say("Voice output test."):
@@ -375,6 +415,7 @@ class TacticalOpsApp:
         self.closing = True
         self.hotkeys.stop()
         self.runner.cancel()
+        self.voice_input.stop()
         self.voice.close()
         self.root.destroy()
 
