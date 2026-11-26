@@ -135,13 +135,13 @@ class ProtocolRunner:
     def _perform(self, description, action, destructive=True):
         if self.config.get("test_mode", True):
             self.log(f"TEST MODE: simulated — {description}")
-            return False
+            return None
         if destructive and not self._allowed():
             self.log(f"Blocked: enable allow_destructive_actions to run — {description}")
-            return False
+            return None
         if os.name != "nt":
             self.log(f"Skipped (Windows only): {description}")
-            return False
+            return None
         action()
         self.log(description)
         return True
@@ -176,7 +176,7 @@ class ProtocolRunner:
 
     def lockdown(self):
         self._perform("Clipboard cleared.", self._clear_clipboard)
-        self._perform("Workstation locked.", self._lock_workstation)
+        self._perform("Workstation locked.", self._lock_workstation, destructive=False)
 
     def ghost(self):
         try:
