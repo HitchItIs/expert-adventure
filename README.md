@@ -31,8 +31,10 @@ elevated permissions on Windows.
 The latest Windows executable is published as a downloadable asset on the
 repository's [Releases page](https://github.com/HitchItIs/expert-adventure/releases).
 Each `v*` version tag builds and publishes `TacticalOpsConsole.exe` and the
-default `config.json`. Keep the files together; the executable also creates a
-default config beside itself if the file is absent.
+default `config.json`. To publish an existing tag manually, open **Actions →
+Release Windows executable → Run workflow** and enter its tag. Keep the files
+together; the executable also creates a default config beside itself if the
+file is absent.
 
 Every push to `main` that changes the application or its dependencies also
 builds an Actions artifact for testing. To build on demand, open
