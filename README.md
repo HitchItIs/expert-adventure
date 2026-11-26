@@ -27,8 +27,14 @@ Global keyboard hooks may require elevated permissions on Windows.
 
 ## Build
 
-Build the Windows executable on Windows (PyInstaller does not cross-compile
-Windows executables from Linux):
+Every push to `main` that changes the application or its dependencies builds a
+Windows executable. To build on demand, open **Actions → Build Windows
+executable → Run workflow**. Download the `TacticalOpsConsole-Windows` artifact
+from the completed run and keep `TacticalOpsConsole.exe` and `config.json`
+together. The artifact is retained for 30 days.
+
+To build locally, use Windows (PyInstaller does not cross-compile Windows
+executables from Linux):
 
 ```powershell
 pyinstaller --onefile --name TacticalOpsConsole --hidden-import pyttsx3.drivers --hidden-import pyttsx3.drivers.sapi5 --hidden-import keyboard --hidden-import rich main.py
