@@ -32,7 +32,7 @@ try {
     Write-Output '__VOICE_READY__'
     while ($true) {
         $result = $recognizer.Recognize()
-        if ($result -and $result.Confidence -ge 0.80 -and $commandMap.ContainsKey($result.Text)) {
+        if ($result -and $commandMap.ContainsKey($result.Text)) {
             Write-Output $commandMap[$result.Text]
         }
     }

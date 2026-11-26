@@ -44,8 +44,8 @@ countdown** and **Exit** remain available in the window. **Test voice** checks
 speech output. When **Voice I/O** is enabled, the app listens locally using
 Windows' built-in speech recognition. Say a full protocol name/code or
 `cancel`; short action words and bare numbers are not voice triggers, reducing
-accidental matches. Low-confidence recognition is ignored, and the listener
-restarts after an unexpected exit (including one caused by locking Windows).
+accidental matches. The listener restarts after an unexpected exit (including
+one caused by locking Windows).
 Voice errors are shown in the radio log. Global keyboard hooks may require
 elevated permissions on Windows.
 
