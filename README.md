@@ -21,17 +21,22 @@ pip install -r requirements.txt
 python main.py
 ```
 
-Use a protocol code, alias, or number in the terminal. Enter `test` to toggle
-simulation mode, `cancel` to abort a shutdown/countdown, and `quit` to exit.
-Global keyboard hooks may require elevated permissions on Windows.
+Use a protocol code, alias, or number in the terminal. Enter `settings` to open
+the hotkey editor, `test` to toggle simulation mode, `cancel` to abort a
+shutdown/countdown, and `quit` to exit. Global keyboard hooks may require
+elevated permissions on Windows.
 
 ## Build
 
-Every push to `main` that changes the application or its dependencies builds a
-Windows executable. To build on demand, open **Actions → Build Windows
-executable → Run workflow**. Download the `TacticalOpsConsole-Windows` artifact
-from the completed run and keep `TacticalOpsConsole.exe` and `config.json`
-together. The artifact is retained for 30 days.
+The latest Windows executable is published as a downloadable asset on the
+repository's [Releases page](https://github.com/HitchItIs/expert-adventure/releases).
+Each `v*` version tag builds and publishes `TacticalOpsConsole.exe` and the
+default `config.json`. Keep the files together; the executable also creates a
+default config beside itself if the file is absent.
+
+Every push to `main` that changes the application or its dependencies also
+builds an Actions artifact for testing. To build on demand, open
+**Actions → Build Windows executable → Run workflow**.
 
 To build locally, use Windows (PyInstaller does not cross-compile Windows
 executables from Linux):

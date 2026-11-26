@@ -13,6 +13,7 @@ from rich.table import Table
 from rich.text import Text
 
 from hotkeys import Hotkeys
+from hotkey_settings import configure_hotkeys
 from protocols import PROTOCOLS, ProtocolRunner, resolve_protocol
 from voice import Voice
 
@@ -96,7 +97,7 @@ def render_dashboard(config, logs):
             table,
             Text("RADIO LOG", style="bold cyan"),
             Text(log_text),
-            Text("Enter code, full name, or number | test | cancel | help | quit", style="dim"),
+            Text("Enter code, full name, or number | settings | test | cancel | help | quit", style="dim"),
         ),
         title="[bold green]TACTICAL OPS CONSOLE[/bold green]",
         border_style="cyan",
@@ -162,7 +163,21 @@ def main():
                     if lowered in {"quit", "exit"}:
                         stop.set()
                         break
-                    if lowered == "test":
+                    if lowered == "settings":
+                        hotkeys.stop()
+                        try:
+                            if configure_hotkeys(config, config_path, save_config):
+                                logs.put("Hotkey settings saved.")
+                            else:
+                                logs.put("Hotkey settings unchanged.")
+                        except RuntimeError as exc:
+                            logs.put(str(exc))
+                        try:
+                            hotkeys.start()
+                            logs.put("Global hotkeys registered.")
+                        except RuntimeError as exc:
+                            logs.put(f"Global hotkeys unavailable: {exc}")
+                    elif lowered == "test":
                         toggle_test_mode()
                     elif lowered == "cancel":
                         runner.cancel()

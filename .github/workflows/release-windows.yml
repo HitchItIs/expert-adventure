@@ -1,0 +1,48 @@
+name: Release Windows executable
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Build executable
+        run: >-
+          pyinstaller --clean --noconfirm --onefile
+          --name TacticalOpsConsole
+          --hidden-import pyttsx3.drivers
+          --hidden-import pyttsx3.drivers.sapi5
+          --hidden-import keyboard
+          --hidden-import rich
+          main.py
+
+      - name: Include default configuration
+        run: Copy-Item config.json dist/config.json
+
+      - name: Publish release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Tactical Ops Console ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            dist/TacticalOpsConsole.exe
+            dist/config.json
