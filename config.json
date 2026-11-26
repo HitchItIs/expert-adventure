@@ -1,0 +1,30 @@
+{
+  "test_mode": true,
+  "allow_destructive_actions": false,
+  "voice_enabled": true,
+  "hotkeys": {
+    "KD-101": "ctrl+alt+1",
+    "EZ-404": "ctrl+alt+2",
+    "AO-07": "ctrl+alt+3",
+    "B6-00": "ctrl+alt+4",
+    "TM-24": "ctrl+alt+5",
+    "CV-99": "ctrl+alt+6",
+    "VD-55": "ctrl+alt+7",
+    "NE-23": "ctrl+alt+8",
+    "SD-883": "ctrl+alt+9",
+    "RK-303": "ctrl+alt+0",
+    "OZ-000": "ctrl+alt+backspace",
+    "TEST": "ctrl+alt+t"
+  },
+  "whitelist": [
+    "Code.exe",
+    "WindowsTerminal.exe",
+    "explorer.exe"
+  ],
+  "apps": [],
+  "urls": [],
+  "decoy_url": "",
+  "gaming_processes": [],
+  "brightness_percent": 30,
+  "shutdown_timer_seconds": 0
+}
