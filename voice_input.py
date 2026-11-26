@@ -32,7 +32,7 @@ try {
     Write-Output '__VOICE_READY__'
     while ($true) {
         $result = $recognizer.Recognize()
-        if ($result -and $commandMap.ContainsKey($result.Text)) {
+        if ($result -and $result.Confidence -ge 0.80 -and $commandMap.ContainsKey($result.Text)) {
             Write-Output $commandMap[$result.Text]
         }
     }
@@ -64,8 +64,6 @@ def _voice_commands():
             protocol.name.replace("-", " "),
             protocol.alias.replace("-", " "),
             protocol.code.replace("-", " "),
-            protocol.description,
-            protocol.number,
         }
         name_prefix = " ".join(protocol.name.split("-")[:-1])
         digits = protocol.name.split("-")[-1]
@@ -74,12 +72,6 @@ def _voice_commands():
                 options = [number_words[digit][language_index] for digit in digits]
                 for spoken_digits in product(*options):
                     phrases.add(f"{name_prefix} {' '.join(spoken_digits)}")
-        if protocol.number in number_words:
-            phrases.update(
-                word
-                for language in number_words[protocol.number]
-                for word in language
-            )
         for phrase in phrases:
             commands[phrase.casefold()] = protocol.code
     return commands
@@ -130,45 +122,48 @@ class VoiceInput:
             encoded_script,
         ]
         creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
-        try:
-            process = subprocess.Popen(
-                args,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                bufsize=1,
-                creationflags=creationflags,
-            )
-        except OSError as exc:
-            self.log(f"Voice input unavailable: {exc}")
-            return
+        while not self._stopping.is_set():
+            try:
+                process = subprocess.Popen(
+                    args,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    encoding="utf-8",
+                    errors="replace",
+                    bufsize=1,
+                    creationflags=creationflags,
+                )
+            except OSError as exc:
+                self.log(f"Voice input unavailable: {exc}")
+                self._stopping.wait(2)
+                continue
 
-        with self._lock:
-            self._process = process
-        try:
-            if self._stopping.is_set():
-                process.terminate()
-            for output in process.stdout:
-                message = output.strip()
-                if message == "__VOICE_READY__":
-                    self.log("Voice input ready. Say a protocol name or number.")
-                elif message.startswith("__VOICE_ERROR__"):
-                    self.log(f"Voice input failed: {message.removeprefix('__VOICE_ERROR__')}")
-                elif message == _CANCEL_COMMAND:
-                    self.on_command("cancel")
-                elif message:
-                    self.on_command(message)
-        finally:
-            if process.poll() is None:
-                try:
-                    process.terminate()
-                except OSError as exc:
-                    self.log(f"Voice input stop failed: {exc}")
-            process.wait()
             with self._lock:
-                if self._process is process:
-                    self._process = None
-            if not self._stopping.is_set() and process.returncode:
-                self.log(f"Voice input stopped unexpectedly (exit {process.returncode}).")
+                self._process = process
+            try:
+                if self._stopping.is_set():
+                    process.terminate()
+                for output in process.stdout:
+                    message = output.strip()
+                    if message == "__VOICE_READY__":
+                        self.log("Voice input ready. Say a full protocol name/code or 'cancel'.")
+                    elif message.startswith("__VOICE_ERROR__"):
+                        self.log(f"Voice input failed: {message.removeprefix('__VOICE_ERROR__')}")
+                    elif message == _CANCEL_COMMAND:
+                        self.on_command("cancel")
+                    elif message:
+                        self.on_command(message)
+            finally:
+                if process.poll() is None:
+                    try:
+                        process.terminate()
+                    except OSError as exc:
+                        self.log(f"Voice input stop failed: {exc}")
+                process.wait()
+                with self._lock:
+                    if self._process is process:
+                        self._process = None
+            if not self._stopping.is_set():
+                self.log(f"Voice input stopped unexpectedly (exit {process.returncode}); restarting.")
+                self._stopping.wait(1)

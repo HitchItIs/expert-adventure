@@ -49,17 +49,17 @@ class Protocol:
 
 
 PROTOCOLS = (
-    Protocol("KD-101", "Kilo-Delta-101", "kilo-delta-101", "1", "Lockdown", "Kilo-Delta-101 bestätigt. System verriegelt."),
-    Protocol("EZ-404", "Echo-Zero-404", "echo-zero-404", "2", "Ghost", "Echo-Zero-404 ausgeführt."),
-    Protocol("AO-07", "Alpha-Oscar-07", "alpha-oscar-07", "3", "Launch", "Alpha-Oscar-07 ausgeführt."),
-    Protocol("B6-00", "Bravo-Six-00", "bravo-six-00", "4", "Blackout", "Bravo-Six-00. Going dark."),
-    Protocol("TM-24", "Tango-Mirage-24", "tango-mirage-24", "5", "Decoy", "Tango-Mirage-24 ausgeführt."),
-    Protocol("CV-99", "Charlie-Victor-99", "charlie-victor-99", "6", "Nuke", "Charlie-Victor-99 ausgeführt."),
-    Protocol("VD-55", "Viper-Delta-55", "viper-delta-55", "7", "Gaming Mode", "Viper-Delta-55 aktiviert."),
-    Protocol("NE-23", "November-Echo-23", "november-echo-23", "8", "Night Mode", "November-Echo-23 aktiviert."),
-    Protocol("SD-883", "Sierra-Delta-883", "sierra-delta-883", "9", "Flush", "Sierra-Delta-883 ausgeführt. System bereinigt."),
-    Protocol("RK-303", "Romeo-Kilo-303", "romeo-kilo-303", "0", "Diagnostik", "Romeo-Kilo-303: Diagnose abgeschlossen."),
-    Protocol("OZ-000", "Omega-Zulu-000", "omega-zulu-000", "backspace", "Self-Destruct (Prank)", "Omega-Zulu-000 sequence complete."),
+    Protocol("KD-101", "Kilo-Delta-101", "kilo-delta-101", "1", "Lockdown — clear clipboard and lock PC", "Kilo-Delta-101 bestätigt. System verriegelt."),
+    Protocol("EZ-404", "Echo-Zero-404", "echo-zero-404", "2", "Ghost — close eligible user apps", "Echo-Zero-404 ausgeführt."),
+    Protocol("AO-07", "Alpha-Oscar-07", "alpha-oscar-07", "3", "Launch — open configured apps and URLs", "Alpha-Oscar-07 ausgeführt."),
+    Protocol("B6-00", "Bravo-Six-00", "bravo-six-00", "4", "Blackout — mute, dim screen, and lock", "Bravo-Six-00. Going dark."),
+    Protocol("TM-24", "Tango-Mirage-24", "tango-mirage-24", "5", "Decoy — minimize windows and open URL", "Tango-Mirage-24 ausgeführt."),
+    Protocol("CV-99", "Charlie-Victor-99", "charlie-victor-99", "6", "Nuke — clear temp/recent items and clipboard", "Charlie-Victor-99 ausgeführt."),
+    Protocol("VD-55", "Viper-Delta-55", "viper-delta-55", "7", "Gaming Mode — stop apps; select performance plan", "Viper-Delta-55 aktiviert."),
+    Protocol("NE-23", "November-Echo-23", "november-echo-23", "8", "Night Mode — dim screen, lower volume, optional timer", "November-Echo-23 aktiviert."),
+    Protocol("SD-883", "Sierra-Delta-883", "sierra-delta-883", "9", "Flush — flush DNS, restart Explorer, report RAM", "Sierra-Delta-883 ausgeführt. System bereinigt."),
+    Protocol("RK-303", "Romeo-Kilo-303", "romeo-kilo-303", "0", "Diagnostics — show CPU, memory, disk, network", "Romeo-Kilo-303: Diagnose abgeschlossen."),
+    Protocol("OZ-000", "Omega-Zulu-000", "omega-zulu-000", "backspace", "Countdown — cancel with Esc or 'cancel'; then lock", "Omega-Zulu-000 sequence complete."),
 )
 PROTOCOLS_BY_CODE = {protocol.code: protocol for protocol in PROTOCOLS}
 

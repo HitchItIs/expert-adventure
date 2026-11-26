@@ -39,6 +39,7 @@ def default_config():
         "test_mode": True,
         "allow_destructive_actions": False,
         "voice_enabled": True,
+        "theme": "dark",
         "hotkeys": DEFAULT_HOTKEYS.copy(),
         "whitelist": ["Code.exe", "WindowsTerminal.exe", "explorer.exe"],
         "apps": [],
@@ -117,6 +118,9 @@ class TacticalOpsApp:
 
     def _build_ui(self):
         style = ttk.Style(self.root)
+        style.theme_use("clam")
+        self.style = style
+        self._apply_theme()
         style.configure("Title.TLabel", font=("Segoe UI", 18, "bold"))
         style.configure("Mode.TLabel", font=("Segoe UI", 10, "bold"))
 
@@ -143,6 +147,9 @@ class TacticalOpsApp:
         ttk.Button(toolbar, text="Change mode", command=self.toggle_test_mode).grid(
             row=0, column=1, padx=(8, 0)
         )
+        self.theme_button = ttk.Button(toolbar, command=self.toggle_theme)
+        self.theme_button.grid(row=0, column=2, padx=(8, 0))
+        self._update_theme_button()
 
         protocol_frame = ttk.Frame(container)
         protocol_frame.grid(row=2, column=0, sticky="nsew")
@@ -163,7 +170,7 @@ class TacticalOpsApp:
         self.protocol_table.column("name", width=210, minwidth=150)
         self.protocol_table.column("code", width=110, minwidth=90, stretch=False)
         self.protocol_table.column("hotkey", width=180, minwidth=140)
-        self.protocol_table.column("description", width=220, minwidth=150)
+        self.protocol_table.column("description", width=365, minwidth=240)
         self.protocol_table.grid(row=0, column=0, sticky="nsew")
         scrollbar = ttk.Scrollbar(
             protocol_frame,
@@ -220,12 +227,18 @@ class TacticalOpsApp:
             state="disabled",
             height=10,
             font=("Consolas", 10),
+            background=self.theme_colors["log_background"],
+            foreground=self.theme_colors["foreground"],
+            insertbackground=self.theme_colors["foreground"],
+            selectbackground=self.theme_colors["selected"],
+            relief="flat",
+            borderwidth=0,
         )
         self.log_view.grid(row=0, column=0, sticky="nsew")
 
         ttk.Label(
             container,
-            text="Enter a protocol code, name, or number. Commands: test, cancel, help, quit.",
+            text="Type 'help' for commands. Voice accepts full protocol names/codes and 'cancel'.",
         ).grid(row=6, column=0, sticky="w", pady=(8, 0))
 
     def _populate_protocol_table(self):
@@ -246,9 +259,152 @@ class TacticalOpsApp:
 
     def _update_mode_label(self):
         if self.config.get("test_mode", True):
-            self.mode_label.configure(text="TEST MODE — simulated", foreground="#8a6500")
+            self.mode_label.configure(
+                text="TEST MODE — simulated",
+                foreground=self.theme_colors["test_mode"],
+            )
         else:
-            self.mode_label.configure(text="LIVE MODE", foreground="#b00020")
+            self.mode_label.configure(
+                text="LIVE MODE",
+                foreground=self.theme_colors["live_mode"],
+            )
+
+    def _apply_theme(self):
+        light = self.config.get("theme", "dark") == "light"
+        self.theme_colors = (
+            {
+                "background": "#f4f6f8",
+                "surface": "#ffffff",
+                "foreground": "#202a33",
+                "muted": "#5b6875",
+                "accent": "#0969da",
+                "border": "#c5ced8",
+                "active": "#e8eef4",
+                "selected": "#dbeafe",
+                "heading": "#e5ebf0",
+                "heading_active": "#d4dde6",
+                "log_background": "#ffffff",
+                "test_mode": "#9a6700",
+                "live_mode": "#cf222e",
+            }
+            if light
+            else {
+                "background": "#111820",
+                "surface": "#1b2632",
+                "foreground": "#e6edf3",
+                "muted": "#9fb0c0",
+                "accent": "#2f81f7",
+                "border": "#354555",
+                "active": "#2a3948",
+                "selected": "#1f4b75",
+                "heading": "#263544",
+                "heading_active": "#34495e",
+                "log_background": "#0d131a",
+                "test_mode": "#e3b341",
+                "live_mode": "#ff7b72",
+            }
+        )
+        colors = self.theme_colors
+        background = colors["background"]
+        surface = colors["surface"]
+        foreground = colors["foreground"]
+        self.root.configure(background=background)
+        self.style.configure(".", background=background, foreground=foreground)
+        self.style.configure("TFrame", background=background)
+        self.style.configure("TLabel", background=background, foreground=foreground)
+        self.style.configure(
+            "TLabelframe", background=background, foreground=foreground
+        )
+        self.style.configure(
+            "TLabelframe.Label",
+            background=background,
+            foreground=colors["muted"],
+        )
+        self.style.configure(
+            "TButton",
+            background=surface,
+            foreground=foreground,
+            padding=(8, 5),
+            bordercolor=colors["border"],
+        )
+        self.style.map(
+            "TButton",
+            background=[
+                ("active", colors["active"]),
+                ("pressed", colors["accent"]),
+            ],
+            foreground=[("disabled", colors["muted"])],
+        )
+        self.style.configure(
+            "TCheckbutton", background=background, foreground=foreground
+        )
+        self.style.map("TCheckbutton", background=[("active", background)])
+        self.style.configure(
+            "TEntry",
+            fieldbackground=surface,
+            foreground=foreground,
+            insertcolor=foreground,
+            bordercolor=colors["border"],
+        )
+        self.style.configure(
+            "TScrollbar",
+            background=surface,
+            troughcolor=background,
+            arrowcolor=foreground,
+            bordercolor=colors["border"],
+        )
+        self.style.configure(
+            "Treeview",
+            background=surface,
+            fieldbackground=surface,
+            foreground=foreground,
+            rowheight=26,
+            bordercolor=colors["border"],
+        )
+        self.style.map(
+            "Treeview",
+            background=[("selected", colors["selected"])],
+            foreground=[("selected", foreground)],
+        )
+        self.style.configure(
+            "Treeview.Heading",
+            background=colors["heading"],
+            foreground=foreground,
+            relief="flat",
+        )
+        self.style.map(
+            "Treeview.Heading",
+            background=[("active", colors["heading_active"])],
+        )
+        if hasattr(self, "log_view"):
+            self.log_view.configure(
+                background=colors["log_background"],
+                foreground=foreground,
+                insertbackground=foreground,
+                selectbackground=colors["selected"],
+            )
+        if hasattr(self, "mode_label"):
+            self._update_mode_label()
+        if hasattr(self, "theme_button"):
+            self._update_theme_button()
+
+    def _update_theme_button(self):
+        theme = self.config.get("theme", "dark")
+        self.theme_button.configure(
+            text="Light mode" if theme == "dark" else "Dark mode"
+        )
+
+    def toggle_theme(self):
+        previous = self.config.get("theme", "dark")
+        self.config["theme"] = "light" if previous == "dark" else "dark"
+        try:
+            save_config(self.config, self.config_path)
+        except OSError as exc:
+            self.config["theme"] = previous
+            messagebox.showerror("Could not save settings", str(exc), parent=self.root)
+            return
+        self._apply_theme()
+        self.logs.put(f"{self.config['theme'].capitalize()} theme enabled.")
 
     def _drain_logs(self):
         if self.closing:
@@ -304,13 +460,39 @@ class TacticalOpsApp:
             self.cancel()
         elif lowered == "settings":
             self.open_settings()
+        elif lowered == "list":
+            for protocol in PROTOCOLS:
+                self.logs.put(
+                    f"{protocol.code} ({protocol.name}) — {protocol.description}."
+                )
+        elif lowered == "status":
+            mode = "TEST" if self.config.get("test_mode", True) else "LIVE"
+            voice = "on" if self.voice.enabled else "off"
+            self.logs.put(
+                f"Status: {mode} mode; voice {voice}; "
+                "destructive actions "
+                f"{'allowed' if self.config.get('allow_destructive_actions') else 'blocked'}."
+            )
+        elif lowered in {"voice on", "voice off"}:
+            self.voice_enabled.set(lowered == "voice on")
+            self.set_voice_enabled()
+        elif lowered in {"mode test", "mode live"}:
+            requested_test_mode = lowered == "mode test"
+            if bool(self.config.get("test_mode", True)) != requested_test_mode:
+                self.toggle_test_mode()
+            else:
+                self.logs.put(
+                    f"{'TEST' if requested_test_mode else 'LIVE'} MODE is already active."
+                )
         elif lowered == "help":
             self.logs.put(
-                "Choose a protocol or enter its code, name, or number. "
-                "Use Cancel timer / countdown to abort an active sequence."
+                "Commands: help (show commands), list (explain protocols), "
+                "status, run <code/name/number>, test (toggle mode), "
+                "mode test|live, voice on|off, settings, cancel, quit/exit."
             )
         else:
-            protocol = resolve_protocol(command)
+            protocol_input = command[4:].strip() if lowered.startswith("run ") else command
+            protocol = resolve_protocol(protocol_input)
             if protocol:
                 self.runner.start(protocol.code)
             else:

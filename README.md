@@ -21,14 +21,33 @@ pip install -r requirements.txt
 python main.py
 ```
 
-Use the protocol list or command field to run a code, alias, or number. The
-**Hotkey settings** button opens the shortcut editor; **Cancel timer /
+Use the protocol list or command field to run a code, alias, or number. Type
+`help` for commands: `list` explains each protocol, `status` shows the current
+mode and voice state, `run <code/name/number>` starts a protocol, `test` toggles
+simulation mode, `mode test|live` selects a mode, `voice on|off` controls voice,
+`settings` opens hotkey settings, `cancel` stops a timer/countdown, and `quit`
+closes the app. Use the **Light mode** / **Dark mode** button to switch the
+interface theme; your choice is saved between launches.
+
+The protocol descriptions are intentionally brief: **KD-101** clears the
+clipboard and locks Windows; **EZ-404** closes eligible user apps; **AO-07**
+opens configured apps and URLs; **B6-00** mutes audio, dims the monitor, and
+locks Windows; **TM-24** minimizes windows and opens the decoy URL; **CV-99**
+clears temporary/recent items and the clipboard; **VD-55** stops configured
+apps and selects the high-performance power plan; **NE-23** dims the screen,
+lowers volume, and can schedule shutdown; **SD-883** flushes DNS, restarts
+Explorer, and reports available RAM; **RK-303** reports system and network
+status; **OZ-000** runs a cancelable 10-second countdown, then locks Windows.
+
+The **Hotkey settings** button opens the shortcut editor; **Cancel timer /
 countdown** and **Exit** remain available in the window. **Test voice** checks
-speech output. When **Voice I/O** is enabled, the app also listens for protocol
-names, action names, numbers, and the `cancel` command using Windows' built-in
-speech recognition; recognition stays on the computer. Voice errors are shown
-in the radio log. Global keyboard hooks may require elevated permissions on
-Windows.
+speech output. When **Voice I/O** is enabled, the app listens locally using
+Windows' built-in speech recognition. Say a full protocol name/code or
+`cancel`; short action words and bare numbers are not voice triggers, reducing
+accidental matches. Low-confidence recognition is ignored, and the listener
+restarts after an unexpected exit (including one caused by locking Windows).
+Voice errors are shown in the radio log. Global keyboard hooks may require
+elevated permissions on Windows.
 
 ## Build
 

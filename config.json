@@ -2,6 +2,7 @@
   "test_mode": true,
   "allow_destructive_actions": false,
   "voice_enabled": true,
+  "theme": "dark",
   "hotkeys": {
     "KD-101": "ctrl+alt+1",
     "EZ-404": "ctrl+alt+2",

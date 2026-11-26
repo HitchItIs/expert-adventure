@@ -14,6 +14,7 @@ class ConfigTests(unittest.TestCase):
             saved = json.loads(path.read_text(encoding="utf-8"))
         self.assertTrue(config["test_mode"])
         self.assertFalse(config["allow_destructive_actions"])
+        self.assertEqual(config["theme"], "dark")
         self.assertEqual(config["hotkeys"]["KD-101"], "ctrl+alt+1")
         self.assertEqual(saved, config)
 
