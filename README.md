@@ -1,7 +1,7 @@
 # TACTICAL OPS CONSOLE
 
-A Windows-oriented Rich dashboard with 11 desktop protocols, configurable global
-hotkeys, offline speech, and a simulation-first mode.
+A Windows desktop dashboard with 11 protocols, configurable global hotkeys,
+offline speech, and a simulation-first mode.
 
 ## Safety and configuration
 
@@ -21,10 +21,11 @@ pip install -r requirements.txt
 python main.py
 ```
 
-Use a protocol code, alias, or number in the terminal. Enter `settings` to open
-the hotkey editor, `test` to toggle simulation mode, `cancel` to abort a
-shutdown/countdown, and `quit` to exit. Global keyboard hooks may require
-elevated permissions on Windows.
+Use the protocol list or command field to run a code, alias, or number. The
+**Hotkey settings** button opens the shortcut editor; **Cancel timer /
+countdown** and **Exit** remain available in the window. **Test voice** checks
+speech output, and voice errors are shown in the radio log. Global keyboard
+hooks may require elevated permissions on Windows.
 
 ## Build
 
@@ -44,7 +45,7 @@ To build locally, use Windows (PyInstaller does not cross-compile Windows
 executables from Linux):
 
 ```powershell
-pyinstaller --onefile --name TacticalOpsConsole --hidden-import pyttsx3.drivers --hidden-import pyttsx3.drivers.sapi5 --hidden-import keyboard --hidden-import rich main.py
+pyinstaller --onefile --windowed --name TacticalOpsConsole --hidden-import pyttsx3.drivers --hidden-import pyttsx3.drivers.sapi5 --collect-submodules comtypes --hidden-import keyboard main.py
 ```
 
 The executable is written to `dist\TacticalOpsConsole.exe`. `config.json` is

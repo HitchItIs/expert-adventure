@@ -32,20 +32,23 @@ def format_hotkey(keysym, state):
     return "+".join([*modifiers, key])
 
 
-def configure_hotkeys(config, config_path, save_config):
+def configure_hotkeys(config, config_path, save_config, parent=None):
     import tkinter as tk
     from tkinter import messagebox, ttk
 
     from protocols import PROTOCOLS
 
     try:
-        root = tk.Tk()
+        root = tk.Toplevel(parent) if parent else tk.Tk()
     except tk.TclError as exc:
         raise RuntimeError(f"Could not open hotkey settings: {exc}") from exc
 
     root.title("Tactical Ops Console - Hotkey Settings")
     root.resizable(False, False)
     root.minsize(540, 500)
+    if parent:
+        root.transient(parent)
+        root.grab_set()
 
     hotkeys = config.setdefault("hotkeys", {})
     original_hotkeys = hotkeys.copy()
@@ -139,5 +142,8 @@ def configure_hotkeys(config, config_path, save_config):
     ttk.Button(buttons, text="Cancel", command=cancel).pack(side="right", padx=(8, 0))
     ttk.Button(buttons, text="Save and apply", command=save_and_close).pack(side="right")
     root.protocol("WM_DELETE_WINDOW", cancel)
-    root.mainloop()
+    if parent:
+        parent.wait_window(root)
+    else:
+        root.mainloop()
     return saved

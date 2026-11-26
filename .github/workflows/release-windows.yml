@@ -32,14 +32,17 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+
       - name: Build executable
         run: >-
-          pyinstaller --clean --noconfirm --onefile
+          pyinstaller --clean --noconfirm --onefile --windowed
           --name TacticalOpsConsole
           --hidden-import pyttsx3.drivers
           --hidden-import pyttsx3.drivers.sapi5
+          --collect-submodules comtypes
           --hidden-import keyboard
-          --hidden-import rich
           main.py
 
       - name: Include default configuration
