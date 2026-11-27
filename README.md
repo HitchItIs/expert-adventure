@@ -29,6 +29,16 @@ simulation mode, `mode test|live` selects a mode, `voice on|off` controls voice,
 closes the app. Use the **Light mode** / **Dark mode** button to switch the
 interface theme; your choice is saved between launches.
 
+## To-do
+
+- Fix voice input so it continues working after Windows is locked and unlocked.
+- Add more voice commands.
+- Make it easier for users to add and configure new commands.
+- Add a securely configured master-password voice confirmation for destructive
+  prompts; never store the password in plaintext or include it in logs.
+- Improve background activity so the app runs reliably without interruptions.
+- Write diagnostic logs to a JSON file to make errors easier to investigate.
+
 The protocol descriptions are intentionally brief: **KD-101** clears the
 clipboard and locks Windows; **EZ-404** closes eligible user apps; **AO-07**
 opens configured apps and URLs; **B6-00** mutes audio, dims the monitor, and
